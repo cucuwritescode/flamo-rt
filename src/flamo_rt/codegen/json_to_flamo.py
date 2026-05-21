@@ -383,10 +383,15 @@ def _build_shell(node, fs, nfft, adb, device):
         core = dsp.Gain(size=(1, 1), nfft=shell_nfft, device=device)
         core.assign_value(torch.ones(1, 1, dtype=torch.float32))
 
+    #the Shell asserts its io layers share the core's nfft. the Shell
+    #node itself carries no flamo metadata, so align the io layers with
+    #whatever nfft the reconstructed core actually uses.
+    core_nfft = getattr(core, "nfft", shell_nfft)
+
     return system.Shell(
         core=core,
-        input_layer=dsp.FFT(shell_nfft),
-        output_layer=dsp.iFFT(shell_nfft),
+        input_layer=dsp.FFT(core_nfft),
+        output_layer=dsp.iFFT(core_nfft),
     )
 
 
