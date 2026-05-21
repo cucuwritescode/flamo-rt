@@ -261,11 +261,7 @@ def _build_sos_filter(node, params, meta, fs, nfft, adb, rg, device):
 
     n_sections = len(sos)
     n_channels = len(sos[0])
-    #parallelSOSFilter's constructor size is just (N,); it internally
-    #expands to (n_sections, 6, N). the "flamo" metadata stores that
-    #expanded internal size, so derive the constructor args from the
-    #sos coefficient shape instead of round-tripping meta["size"].
-    size = (n_channels,)
+    size = tuple(meta.get("size", (n_channels,)))
 
     #try parallelSOSFilter first, fall back to parallelBiquad
     sos_6coeff = _denormalise_sos(sos)
